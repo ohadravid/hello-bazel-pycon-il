@@ -1,0 +1,5 @@
+FROM ghcr.io/astral-sh/uv:debian
+
+COPY . /app
+WORKDIR /app
+RUN uv run pytest
