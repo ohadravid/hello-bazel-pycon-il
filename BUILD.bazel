@@ -1,0 +1,97 @@
+load("@aspect_bazel_lib//lib:transitions.bzl", "platform_transition_filegroup")
+load("@aspect_rules_py//py:defs.bzl", "py_binary", "py_image_layer", "py_library", "py_test")
+load("@container_structure_test//:defs.bzl", "container_structure_test")
+load("@pip//:requirements.bzl", "requirement")
+load("@rules_oci//oci:defs.bzl", "oci_image", "oci_load")
+load("@rules_python//python:pip.bzl", "compile_pip_requirements")
+load("@rules_uv//uv:venv.bzl", "create_venv")
+
+compile_pip_requirements(
+    name = "requirements",
+    src = "//:pyproject.toml",
+    requirements_txt = "//:requirements.txt",
+)
+
+create_venv(
+    name = "create_venv",
+    requirements_txt = "//:requirements.txt",
+)
+
+py_library(
+    name = "demo",
+    srcs = glob(["src/**/*.py"]),
+    imports = ["src/."],
+    deps = [
+        requirement("flask"),
+        requirement("torch"),
+        requirement("torchvision"),
+        requirement("certifi"),
+    ],
+)
+
+py_binary(
+    name = "main",
+    srcs = ["main.py"],
+    deps = [
+        ":demo",
+    ],
+)
+
+py_test(
+    name = "test",
+    srcs = glob(["tests/**/*.py"]),
+    data = glob([
+        "tests/**/*.jpg",
+    ]),
+    pytest_main = True,
+    deps = [
+        ":demo",
+        requirement("pytest"),
+    ],
+)
+
+py_image_layer(
+    name = "layers",
+    binary = ":main",
+)
+
+oci_image(
+    name = "image",
+    base = "@ubuntu",
+    entrypoint = ["/main"],
+    tars = [":layers"],
+)
+
+platform(
+    name = "aarch64_linux",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:aarch64",
+    ],
+)
+
+platform(
+    name = "x86_64_linux",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+    ],
+)
+
+platform_transition_filegroup(
+    name = "platform_image",
+    srcs = [":image"],
+    target_platform = select({
+        "@platforms//cpu:arm64": ":aarch64_linux",
+        "@platforms//cpu:x86_64": ":x86_64_linux",
+    }),
+)
+
+# To build the image and load it into it into a local runtime:
+# $ bazel run :image_load
+# $ docker run --rm gcr.io/demo:latest
+oci_load(
+    name = "image_load",
+    image = ":platform_image",
+    repo_tags = ["gcr.io/demo:latest"],
+)

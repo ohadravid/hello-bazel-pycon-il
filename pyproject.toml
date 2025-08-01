@@ -1,14 +1,15 @@
 [project]
-name = "hello-bazel-pycon-il"
+name = "demo"
 version = "0.1.0"
-description = "Add your description here"
-readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "flask>=3.1.1",
+    "torch>=2.7.1",
+    "torchvision>=0.22.1",
+    "pytest>=8.4.1",
+    "certifi>=2025.7.14",
 ]
 
-[dependency-groups]
-dev = [
-    "pytest>=8.4.1",
-]
+[build-system]
+requires = ["uv_build>=0.8.4,<0.9.0"]
+build-backend = "uv_build"
