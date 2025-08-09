@@ -95,3 +95,20 @@ oci_load(
     image = ":platform_image",
     repo_tags = ["gcr.io/demo:latest"],
 )
+
+py_test(
+    name = "integration_test",
+    srcs = ["integration_test.py"],
+    data = [":platform_image"] + glob([
+        "tests/**/*.jpg",
+    ]),
+    pytest_main = True,
+    deps = [
+        requirement("pytest"),
+        requirement("testcontainers"),
+    ],    
+    tags = [
+        "no-remote-exec",
+        "requires-docker",
+    ],
+)

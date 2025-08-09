@@ -43,6 +43,12 @@ bazel run :image_load
 docker run --rm -it -p 5000:5000 gcr.io/demo:latest
 ```
 
+Or, to run the integration test:
+
+```bash
+bazel test --test_output=streamed :integration_test
+```
+
 To update the `requirements.txt` lock file from the `project.toml`'s dependencies, run:
 
 ```bash
