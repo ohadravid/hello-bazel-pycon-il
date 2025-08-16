@@ -6,6 +6,8 @@ from torchvision import io
 from werkzeug import Request
 import os
 import certifi
+from hello_rs import hello_rs
+
 os.environ["SSL_CERT_FILE"] = certifi.where()
 
 Request.max_form_parts = 16 * 1024 * 1024
@@ -17,7 +19,7 @@ app.config['MAX_FORM_MEMORY_SIZE'] = 50 * 1024 * 1024
 
 @app.route("/")
 def hello_world():
-    return "<p>Hello, World!</p>"
+    return f"<p>{hello_rs.hello()}</p>"
 
 
 @app.post("/classify")

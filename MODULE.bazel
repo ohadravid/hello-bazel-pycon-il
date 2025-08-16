@@ -32,6 +32,32 @@ pip.parse(
 )
 use_repo(pip, "pip")
 
+bazel_dep(name = "rules_rust", version = "0.63.0")
+
+crate = use_extension("@rules_rust//crate_universe:extensions.bzl", "crate")
+
+crate.from_cargo(
+    name = "crates",
+    cargo_lockfile = "//:Cargo.lock",
+    manifests = ["//:Cargo.toml"],
+)
+use_repo(crate, "crates")
+
+git_override(
+    module_name = "rules_pyo3",
+    remote = "https://github.com/abrisco/rules_pyo3.git",
+    commit = "7b0b32e7a03df9c1a5f33727a3810834b1f98b9f",
+)
+
+bazel_dep(name = "rules_pyo3", version = "0.0.9")
+
+# Register default toolchains or customize your own.
+register_toolchains(
+    "@rules_pyo3//pyo3/toolchains:toolchain",
+    "@rules_pyo3//pyo3/toolchains:rust_toolchain",
+)
+
+
 ##########################
 # Container images
 oci = use_extension("@rules_oci//oci:extensions.bzl", "oci")

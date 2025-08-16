@@ -1,0 +1,9 @@
+load("@rules_pyo3//pyo3:defs.bzl", "pyo3_extension")
+
+pyo3_extension(
+    name="hello_rs", 
+    srcs=glob(["src/**/*.rs"]),
+    edition = "2024",
+    version="0.0.1",
+    visibility=["//visibility:public"],
+)
