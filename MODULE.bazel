@@ -5,9 +5,9 @@ module(
 
 bazel_dep(name = "aspect_rules_py", version = "1.6.1")
 
-bazel_dep(name = "rules_python", version = "1.5.1", dev_dependency = True)
+bazel_dep(name = "rules_python", version = "1.5.3")
 
-bazel_dep(name = "platforms", version = "0.0.11")
+bazel_dep(name = "platforms", version = "1.0.0")
 bazel_dep(name = "rules_uv", version = "0.85.0")
 bazel_dep(name = "aspect_bazel_lib", version = "2.20.0")
 bazel_dep(name = "rules_oci", version = "2.2.6")
@@ -32,7 +32,26 @@ pip.parse(
 )
 use_repo(pip, "pip")
 
+bazel_dep(name = "hermetic_cc_toolchain", version = "3.1.0")
+
+toolchains = use_extension("@hermetic_cc_toolchain//toolchain:ext.bzl", "toolchains")
+use_repo(toolchains, "zig_sdk")
+
 bazel_dep(name = "rules_rust", version = "0.63.0")
+
+RUST_VERSION = "1.89.0"
+
+rust = use_extension("@rules_rust//rust:extensions.bzl", "rust")
+rust.toolchain(
+    extra_target_triples = [
+        "aarch64-unknown-linux-gnu",
+        "x86_64-unknown-linux-gnu",
+    ],
+    versions = [RUST_VERSION],
+)
+use_repo(rust, "rust_toolchains")
+
+register_toolchains("@rust_toolchains//:all")
 
 crate = use_extension("@rules_rust//crate_universe:extensions.bzl", "crate")
 
@@ -46,7 +65,7 @@ use_repo(crate, "crates")
 git_override(
     module_name = "rules_pyo3",
     remote = "https://github.com/abrisco/rules_pyo3.git",
-    commit = "7b0b32e7a03df9c1a5f33727a3810834b1f98b9f",
+    commit = "c49531de330a7b12dc16d25b24150d910aad2ecd",
 )
 
 bazel_dep(name = "rules_pyo3", version = "0.0.9")
