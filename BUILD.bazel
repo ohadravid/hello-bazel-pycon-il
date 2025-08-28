@@ -2,7 +2,8 @@ load("@aspect_bazel_lib//lib:transitions.bzl", "platform_transition_filegroup")
 load("@aspect_rules_py//py:defs.bzl", "py_binary", "py_image_layer", "py_library", "py_test")
 load("@container_structure_test//:defs.bzl", "container_structure_test")
 load("@pip//:requirements.bzl", "requirement")
-load("@rules_oci//oci:defs.bzl", "oci_image", "oci_load")
+load("@rules_oci//oci:defs.bzl", "oci_image", "oci_load", "oci_image_index")
+load(":transition.bzl", "multi_arch")
 load("@rules_python//python:pip.bzl", "compile_pip_requirements")
 load("@rules_uv//uv:venv.bzl", "create_venv")
 
@@ -10,6 +11,7 @@ compile_pip_requirements(
     name = "requirements",
     src = "//:pyproject.toml",
     requirements_txt = "//:requirements.txt",
+    requirements_linux = "//:requirements_linux.txt",
 )
 
 create_venv(
@@ -112,4 +114,28 @@ py_test(
         "no-remote-exec",
         "requires-docker",
     ],
+)
+
+## Multiarch (combined aarch64 and x86_64) Image Build
+multi_arch(
+    name = "images",
+    image = ":platform_image",
+    platforms = [
+        ":aarch64_linux",
+        ":x86_64_linux",
+    ],
+)
+
+oci_image_index(
+    name = "index",
+    images = [
+        ":images",
+    ],
+)
+
+oci_load(
+    name = "image_load_multiarch",
+    image = ":index",
+    repo_tags = ["gcr.io/demo:latest-multiarch"],
+    format = "oci",
 )
