@@ -3,13 +3,13 @@ module(
     version = "0.0.0",
 )
 
-bazel_dep(name = "aspect_rules_py", version = "1.6.1")
+bazel_dep(name = "aspect_rules_py", version = "1.6.3")
 
 bazel_dep(name = "rules_python", version = "1.5.3")
 
 bazel_dep(name = "platforms", version = "1.0.0")
 bazel_dep(name = "rules_uv", version = "0.85.0")
-bazel_dep(name = "aspect_bazel_lib", version = "2.20.0")
+bazel_dep(name = "aspect_bazel_lib", version = "2.21.1")
 bazel_dep(name = "rules_oci", version = "2.2.6")
 bazel_dep(name = "container_structure_test", version = "1.19.1")
 
