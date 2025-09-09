@@ -1,7 +1,11 @@
 ## Intro 👋🌿
 
-This repo is part of a short talk for PyCon IL 2025,
+This repo is part of a [short talk for PyCon IL 2025](https://ohadravid.github.io/posts/2025-09-hello-bazel/),
 which shows how to use [Bazel](https://bazel.build/) to build Python code (and why that can be useful).
+
+<p align="center">
+    <img src="./bazel_graph.webp" width=50% />
+</p>
 
 It contains a small Flask server that can classify images using `resnet50` from [PyTorch Hub](https://pytorch.org/hub/),
 that can be built (as a Docker image) using either Docker or Bazel.
